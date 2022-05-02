@@ -2,14 +2,22 @@ import React, { useState } from 'react'
 import { TextField, Card, CardContent, CardActions, Button, Typography} from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
+import Checkbox from '@mui/material/Checkbox';
+
+const label = { inputProps: { 'aria-label': 'Checkbox' } };
 
 export const TodoListForm = ({ todoList, saveTodoList }) => {
   const [todos, setTodos] = useState(todoList.todos)
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault()
     saveTodoList(todoList.id, { todos })
   }
+
+  const handleBlur = () => {
+    saveTodoList(todoList.id, { todos })
+  }
+
 
   return (
     <Card sx={{margin: '0 1rem'}}>
@@ -18,7 +26,7 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
           {todoList.title}
         </Typography>
         <form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column', flexGrow: 1}}>
-          {todos.map((name, index) => (
+          {todos.map((todo, index) => (
             <div key={index} style={{display: 'flex', alignItems: 'center'}}>
               <Typography sx={{margin: '8px'}} variant='h6'>
                 {index + 1}
@@ -26,15 +34,32 @@ export const TodoListForm = ({ todoList, saveTodoList }) => {
               <TextField
                 sx={{flexGrow: 1, marginTop: '1rem'}}
                 label='What to do?'
-                value={name}
+                value={todo.title}
                 onChange={event => {
                   setTodos([ // immutable update
                     ...todos.slice(0, index),
-                    event.target.value,
+                    {title: event.target.value,
+                      completed: todos[index].completed 
+                    },
                     ...todos.slice(index + 1)
                   ])
                 }}
+                onBlur={handleBlur}
               />
+              <Button
+               sx={{margin: '8px'}}
+               size='small'
+               color='primary'
+              >
+               <Checkbox 
+               {...label}
+               checked={todo.completed}
+               onClick={() => {
+                todo.completed = !todo.completed
+                setTodos([...todos])
+               }}
+               />
+              </Button>
               <Button
                 sx={{margin: '8px'}}
                 size='small'
